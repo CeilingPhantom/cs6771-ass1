@@ -1,7 +1,15 @@
 cxx_library(
+	TARGET word_web
+	FILENAME word_web.cpp
+	LINK
+		absl::flat_hash_map
+		absl::flat_hash_set
+)
+
+cxx_library(
 	TARGET word_ladder
 	FILENAME word_ladder.cpp
-	LINK range-v3 absl::flat_hash_set
+	LINK range-v3 absl::flat_hash_set word_web
 )
 
 cxx_library(

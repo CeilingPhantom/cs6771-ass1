@@ -7,7 +7,7 @@ namespace word_ladder {
                   const std::string& to,
                   const absl::flat_hash_set<std::string>& lexicon)
                   -> std::vector<std::vector<std::string>> {
-        WordWeb web(from.length(), lexicon);
-        return web.optimal_ladders_sorted(from, to);
+        word_web web(from.length(), lexicon);
+        return web.shortest_ladders_sorted(from, to);
     }
 }  // namespace word_ladder
