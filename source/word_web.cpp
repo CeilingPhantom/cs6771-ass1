@@ -41,7 +41,7 @@ namespace word_ladder {
     void word_web::add_edge(const std::string& str1, const std::string& str2) {
         web_[str1].insert(str2);
         web_[str2].insert(str1);
-        // std::cout << str1 << " - " << str2 << std::endl;
+        std::cout << str1 << " - " << str2 << std::endl;
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)
@@ -91,14 +91,13 @@ namespace word_ladder {
     auto word_web::shortest_ladders_sorted(const std::string &from, const std::string &to)
         -> std::vector<std::vector<std::string>> {
         auto ladders = shortest_ladders(from, to);
-        /*
+        std::cout << std::endl;
         for (auto& ladder : ladders) {
             for (auto& word : ladder) {
                 std::cout << word << " ";
             }
             std::cout << std::endl;
         }
-        */
         // sort shortest ladders
         std::sort(ladders.begin(), ladders.end(),
             [](std::vector<std::string>& ladder1, std::vector<std::string>& ladder2) {
