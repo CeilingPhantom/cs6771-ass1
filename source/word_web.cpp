@@ -21,7 +21,8 @@ namespace word_ladder {
         // fill web
         for (auto it1 = req_lexicon.begin(); it1 != req_lexicon.end(); it1++) {
             auto word1 = std::string(*it1);
-            for (auto it2 = it1++; it2 != req_lexicon.end(); it2++) {
+            auto it2 = it1;
+            for (it2++; it2 != req_lexicon.end(); it2++) {
                 auto word2 = std::string(*it2);
                 if (one_char_diff(word1, word2)) {
                     add_edge(word1, word2);
@@ -41,7 +42,7 @@ namespace word_ladder {
     void word_web::add_edge(const std::string& str1, const std::string& str2) {
         web_[str1].insert(str2);
         web_[str2].insert(str1);
-        std::cout << str1 << " - " << str2 << std::endl;
+        //std::cout << str1 << " - " << str2 << std::endl;
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)
@@ -85,6 +86,10 @@ namespace word_ladder {
                 }
             }
         }
+        // remove non shortest ladders
+        ladders.erase(std::remove_if(ladders.begin(), ladders.end(), [min](const std::vector<std::string>& ladder) {
+            return ladder.size() > min;
+        }), ladders.end());
         return ladders;
     }
 
