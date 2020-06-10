@@ -7,6 +7,8 @@
 
 #include "absl/container/flat_hash_map.h"
 #include "absl/container/flat_hash_set.h"
+#include "range/v3/numeric.hpp"
+#include "range/v3/view.hpp"
 #include "word_web.hpp"
 
 namespace word_ladder {
@@ -15,7 +17,7 @@ namespace word_ladder {
         for (auto& word : lexicon) {
             if (word.length() == word_len) {
                 req_lexicon.insert(word);
-                web_[word] = absl::flat_hash_set<std::string>();
+                web_[word] = absl::flat_hash_map<std::string, unsigned int>();
             }
         }
         // fill web
@@ -24,26 +26,48 @@ namespace word_ladder {
             auto it2 = it1;
             for (it2++; it2 != req_lexicon.end(); it2++) {
                 auto word2 = std::string(*it2);
-                if (is_hamming_dist_1(word1, word2)) {
-                    add_edge(word1, word2);
+                auto d = hamming_dist(word1, word2);
+                if (d < word_len) {
+                    add_edge(word1, word2, d);
                 }
             }
         }
     }
 
     // assumes both strings are of the same length
-    auto word_web::is_hamming_dist_1(const std::string& str1, const std::string& str2) -> bool {
+    auto word_web::hamming_dist(const std::string& str1, const std::string& str2) -> unsigned int {
         if (str1 == str2) {
-            return false;
+            return 0;
         }
-        auto mismatch_pair = std::mismatch(str1.begin(), str1.end(), str2.begin());
-        return std::mismatch(++mismatch_pair.first, str1.end(), ++mismatch_pair.second).first == str1.end();
+        auto d = ranges::views::zip_with(ranges::not_equal_to{}, str1, str2);
+        // should be fine since it will always be >0
+        return static_cast<unsigned int>(ranges::accumulate(d, 0));
     }
 
-    void word_web::add_edge(const std::string& str1, const std::string& str2) {
-        web_[str1].insert(str2);
-        web_[str2].insert(str1);
+    void word_web::add_edge(const std::string& str1, const std::string& str2, const unsigned int& weight) {
+        web_[str1][str2] = weight;
+        web_[str2][str1] = weight;
         //std::cout << str1 << " - " << str2 << std::endl;
+    }
+
+    auto word_web::ladder_len(std::vector<std::string>& ladder) -> unsigned int {
+        unsigned int len = 0;
+        auto it1 = ladder.begin();
+        auto it2 = it1 + 1;
+        while (it2 != ladder.end()) {
+            len += web_[*it1][*it2];
+            it1++;
+            it2++;
+        }
+        return len;
+    }
+
+    // check to see if two words can connect 1 letter at a time in the web
+    auto word_web::validate_edge(std::string curr_word, std::string& next_word) -> bool {
+        while (curr_word != next_word) {
+            web_[curr_word]
+        }
+        return false;
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)
@@ -79,9 +103,9 @@ namespace word_ladder {
                     continue;
                 }
                 for (const auto& next : web_[curr]) {
-                    if (std::find(path.begin(), path.end(), next) == path.end()) {
+                    if (std::find(path.begin(), path.end(), next.first) == path.end()) {
                         auto new_path(path);
-                        new_path.push_back(next);
+                        new_path.push_back(next.first);
                         q.push(new_path);
                     }
                 }
