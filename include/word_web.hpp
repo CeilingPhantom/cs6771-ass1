@@ -11,21 +11,19 @@
 namespace word_ladder {
     class word_web {
 
-            const std::size_t& word_len_;
             // web stored as adjacency list
             absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> web_;
 
-            void init_web(const absl::flat_hash_set<std::string>& lexicon);
-            static auto one_char_diff(const std::string& str1, const std::string& str2) -> bool;
+            void init_web(const std::size_t& word_len, const absl::flat_hash_set<std::string>& lexicon);
+            static auto is_hamming_dist_1(const std::string& str1, const std::string& str2) -> bool;
             void add_edge(const std::string& str1, const std::string& str2);
 
             auto shortest_ladders(const std::string& from, const std::string& to)
                 -> std::vector<std::vector<std::string>>;
 
         public:
-            word_web(const std::size_t& word_len, const absl::flat_hash_set<std::string>& lexicon)
-                : word_len_(word_len) {
-                init_web(lexicon);
+            word_web(const std::size_t& word_len, const absl::flat_hash_set<std::string>& lexicon) {
+                init_web(word_len, lexicon);
             }
             auto shortest_ladders_sorted(const std::string& from, const std::string& to)
                 -> std::vector<std::vector<std::string>>;

@@ -10,10 +10,10 @@
 #include "word_web.hpp"
 
 namespace word_ladder {
-    void word_web::init_web(const absl::flat_hash_set<std::string>& lexicon) {
+    void word_web::init_web(const std::size_t& word_len, const absl::flat_hash_set<std::string>& lexicon) {
         absl::flat_hash_set<std::string> req_lexicon;
         for (auto& word : lexicon) {
-            if (word.length() == word_len_) {
+            if (word.length() == word_len) {
                 req_lexicon.insert(word);
                 web_[word] = absl::flat_hash_set<std::string>();
             }
@@ -24,14 +24,15 @@ namespace word_ladder {
             auto it2 = it1;
             for (it2++; it2 != req_lexicon.end(); it2++) {
                 auto word2 = std::string(*it2);
-                if (one_char_diff(word1, word2)) {
+                if (is_hamming_dist_1(word1, word2)) {
                     add_edge(word1, word2);
                 }
             }
         }
     }
 
-    auto word_web::one_char_diff(const std::string& str1, const std::string& str2) -> bool {
+    // assumes both strings are of the same length
+    auto word_web::is_hamming_dist_1(const std::string& str1, const std::string& str2) -> bool {
         if (str1 == str2) {
             return false;
         }
@@ -87,7 +88,7 @@ namespace word_ladder {
             }
         }
         // remove non shortest ladders
-        ladders.erase(std::remove_if(ladders.begin(), ladders.end(), [min](const std::vector<std::string>& ladder) {
+        ladders.erase(std::remove_if(ladders.begin(), ladders.end(), [&min](const std::vector<std::string>& ladder) {
             return ladder.size() > min;
         }), ladders.end());
         return ladders;
