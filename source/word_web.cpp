@@ -54,13 +54,22 @@ namespace word_ladder {
         std::vector<std::vector<std::string>> ladders;
         std::queue<std::vector<std::string>> q;
         std::vector<std::string> path;
-        absl::flat_hash_set<std::string> visited;
+        std::size_t prev_ladder_len = 0;
+        absl::flat_hash_set<std::string> visited_prev_ladder_len;
+        absl::flat_hash_set<std::string> visited_curr_ladder_len;
         path.push_back(from);
-        visited.insert(from);
+        visited_curr_ladder_len.insert(from);
         q.push(path);
         while (!q.empty()) {
             path = q.front();
             q.pop();
+            // if path length increased
+            // should be an increase by 1
+            if (path.size() != prev_ladder_len) {
+                visited_prev_ladder_len = visited_curr_ladder_len;
+                visited_prev_ladder_len.clear();
+                prev_ladder_len++;
+            }
             const auto& curr = path.back();
             // path is a ladder
             if (curr == to) {
@@ -87,10 +96,11 @@ namespace word_ladder {
                 }
                 for (const auto& next : web_[curr]) {
                     // check next word isn't one that we've already visited
-                    if (!visited.contains(next)) {
+                    if (std::find(path.begin(), path.end(), next) == path.end()
+                        && !visited_prev_ladder_len.contains(next)) {
                         auto new_path(path);
                         new_path.push_back(next);
-                        visited.insert(next);
+                        visited_curr_ladder_len.insert(next);
                         q.push(new_path);
                     }
                 }

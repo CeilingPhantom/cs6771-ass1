@@ -17,6 +17,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "catch2/catch.hpp"
 #include "comp6771/testing/range/contain.hpp"
@@ -27,6 +28,8 @@
 TEST_CASE("atlases -> cabaret") {
 	auto const english_lexicon = ::word_ladder::read_lexicon("./english.txt");
 	auto const ladders = ::word_ladder::generate("atlases", "cabaret", english_lexicon);
+
+	std::cout << ":" << ladders.size() << std::endl;
 
 	CHECK(ranges::size(ladders) != 0);
 }

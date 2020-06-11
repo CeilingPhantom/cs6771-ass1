@@ -13,7 +13,7 @@ cxx_test(
 )
 
 cxx_test(
-   TARGET t01
-   FILENAME t01.cpp
+   TARGET word_ladder_test_benchmark
+   FILENAME word_ladder_test_benchmark.cpp
    LINK word_ladder lexicon Catch2::Catch2 range-v3 test_main
 )
