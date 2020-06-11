@@ -12,15 +12,12 @@ namespace word_ladder {
     class word_web {
 
             // web stored as adjacency list
-            absl::flat_hash_map<std::string, absl::flat_hash_map<std::string, unsigned int>> web_;
-            absl::flat_hash_map<std::string, absl::flat_hash_map<unsigned int, std::vector<std::string>>> web_by_weight_;
+            absl::flat_hash_map<std::string, absl::flat_hash_set<std::string>> web_;
 
             void init_web(const std::size_t& word_len, const absl::flat_hash_set<std::string>& lexicon);
-            static auto hamming_dist(const std::string& str1, const std::string& str2) -> unsigned int;
-            void add_edge(const std::string& str1, const std::string& str2, const unsigned int& weight);
+            static auto is_hamming_dist_1(const std::string& str1, const std::string& str2) -> bool;
+            void add_edge(const std::string& str1, const std::string& str2);
 
-            auto ladder_len(std::vector<std::string>& ladder) -> unsigned int;
-            auto validate_edge(std::string curr_word, std::string& next_word) -> bool;
             auto shortest_ladders(const std::string& from, const std::string& to)
                 -> std::vector<std::vector<std::string>>;
 

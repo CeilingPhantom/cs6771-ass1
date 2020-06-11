@@ -17,7 +17,7 @@ namespace word_ladder {
         for (auto& word : lexicon) {
             if (word.length() == word_len) {
                 req_lexicon.insert(word);
-                web_[word] = absl::flat_hash_map<std::string, unsigned int>();
+                web_[word] = absl::flat_hash_set<std::string>();
             }
         }
         // fill web
@@ -26,48 +26,26 @@ namespace word_ladder {
             auto it2 = it1;
             for (it2++; it2 != req_lexicon.end(); it2++) {
                 auto word2 = std::string(*it2);
-                auto d = hamming_dist(word1, word2);
-                if (d < word_len) {
-                    add_edge(word1, word2, d);
+                if (is_hamming_dist_1(word1, word2)) {
+                    add_edge(word1, word2);
                 }
             }
         }
     }
 
     // assumes both strings are of the same length
-    auto word_web::hamming_dist(const std::string& str1, const std::string& str2) -> unsigned int {
+    auto word_web::is_hamming_dist_1(const std::string& str1, const std::string& str2) -> bool {
         if (str1 == str2) {
-            return 0;
+            return false;
         }
-        auto d = ranges::views::zip_with(ranges::not_equal_to{}, str1, str2);
-        // should be fine since it will always be >0
-        return static_cast<unsigned int>(ranges::accumulate(d, 0));
+        auto mismatch_pair = std::mismatch(str1.begin(), str1.end(), str2.begin());
+        return std::mismatch(++mismatch_pair.first, str1.end(), ++mismatch_pair.second).first == str1.end();
     }
 
-    void word_web::add_edge(const std::string& str1, const std::string& str2, const unsigned int& weight) {
-        web_[str1][str2] = weight;
-        web_[str2][str1] = weight;
+    void word_web::add_edge(const std::string& str1, const std::string& str2) {
+        web_[str1].insert(str2);
+        web_[str2].insert(str1);
         //std::cout << str1 << " - " << str2 << std::endl;
-    }
-
-    auto word_web::ladder_len(std::vector<std::string>& ladder) -> unsigned int {
-        unsigned int len = 0;
-        auto it1 = ladder.begin();
-        auto it2 = it1 + 1;
-        while (it2 != ladder.end()) {
-            len += web_[*it1][*it2];
-            it1++;
-            it2++;
-        }
-        return len;
-    }
-
-    // check to see if two words can connect 1 letter at a time in the web
-    auto word_web::validate_edge(std::string curr_word, std::string& next_word) -> bool {
-        while (curr_word != next_word) {
-            web_[curr_word]
-        }
-        return false;
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)
@@ -76,7 +54,9 @@ namespace word_ladder {
         std::vector<std::vector<std::string>> ladders;
         std::queue<std::vector<std::string>> q;
         std::vector<std::string> path;
+        absl::flat_hash_set<std::string> visited;
         path.push_back(from);
+        visited.insert(from);
         q.push(path);
         while (!q.empty()) {
             path = q.front();
@@ -88,13 +68,16 @@ namespace word_ladder {
                 if (ladders.empty()) {
                     min = path.size();
                 }
-                // if path is shorter than min
-                if (path.size() < min) {
+                // else if path is shorter than min
+                else if (path.size() < min) {
                     min = path.size();
                     // purge ladders
                     ladders.clear();
                 }
-                ladders.push_back(path);
+                // only add ladders of the shortest length
+                if (path.size() == min) {
+                    ladders.push_back(path);
+                }
             }
             // keep traversing web
             else {
@@ -103,24 +86,29 @@ namespace word_ladder {
                     continue;
                 }
                 for (const auto& next : web_[curr]) {
-                    if (std::find(path.begin(), path.end(), next.first) == path.end()) {
+                    // check next word isn't one that we've already visited
+                    if (!visited.contains(next)) {
                         auto new_path(path);
-                        new_path.push_back(next.first);
+                        new_path.push_back(next);
+                        visited.insert(next);
                         q.push(new_path);
                     }
                 }
             }
         }
+        /*
         // remove non shortest ladders
         ladders.erase(std::remove_if(ladders.begin(), ladders.end(), [&min](const std::vector<std::string>& ladder) {
             return ladder.size() > min;
         }), ladders.end());
+        */
         return ladders;
     }
 
     auto word_web::shortest_ladders_sorted(const std::string &from, const std::string &to)
         -> std::vector<std::vector<std::string>> {
         auto ladders = shortest_ladders(from, to);
+        /*
         std::cout << std::endl;
         for (auto& ladder : ladders) {
             for (auto& word : ladder) {
@@ -128,6 +116,7 @@ namespace word_ladder {
             }
             std::cout << std::endl;
         }
+        */
         // sort shortest ladders
         std::sort(ladders.begin(), ladders.end(),
             [](std::vector<std::string>& ladder1, std::vector<std::string>& ladder2) {
