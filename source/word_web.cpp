@@ -63,11 +63,11 @@ namespace word_ladder {
     }
 
     // check to see if two words can connect 1 letter at a time in the web
-    auto word_web::validate_edge(std::string curr_word, std::string& next_word) -> bool {
-        while (curr_word != next_word) {
-            web_[curr_word]
+    auto word_web::validate_edge(std::string& curr_word, std::string& next_word) -> bool {
+        if (web_by_weight_[curr_word][1].contains(next_word)) {
+            return true;
         }
-        return false;
+        for
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)

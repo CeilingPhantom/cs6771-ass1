@@ -13,7 +13,7 @@ namespace word_ladder {
 
             // web stored as adjacency list
             absl::flat_hash_map<std::string, absl::flat_hash_map<std::string, unsigned int>> web_;
-            absl::flat_hash_map<std::string, absl::flat_hash_map<unsigned int, std::vector<std::string>>> web_by_weight_;
+            absl::flat_hash_map<std::string, absl::flat_hash_map<unsigned int, absl::flat_hash_set<std::string>>> web_by_weight_;
 
             void init_web(const std::size_t& word_len, const absl::flat_hash_set<std::string>& lexicon);
             static auto hamming_dist(const std::string& str1, const std::string& str2) -> unsigned int;
