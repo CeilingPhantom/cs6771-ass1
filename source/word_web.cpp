@@ -55,7 +55,7 @@ namespace word_ladder {
         //std::cout << str1 << " - " << str2 << std::endl;
     }
 
-    auto word_web::ladder_len(std::vector<std::string>& ladder) -> unsigned int {
+    auto word_web::ladder_len(const std::vector<std::string>& ladder) -> unsigned int {
         unsigned int len = 0;
         auto it1 = ladder.begin();
         auto it2 = it1 + 1;
@@ -113,12 +113,15 @@ namespace word_ladder {
                     min = path.size();
                 }
                 // if path is shorter than min
-                if (path.size() < min) {
+                else if (path.size() < min) {
                     min = path.size();
                     // purge ladders
                     ladders.clear();
                 }
-                ladders.push_back(path);
+                // only add ladders of the shortest length
+                if (path.size() == min) {
+                    ladders.push_back(path);
+                }
             }
             // keep traversing web
             else {
@@ -136,10 +139,12 @@ namespace word_ladder {
                 }
             }
         }
+        /*
         // remove non shortest ladders
-        ladders.erase(std::remove_if(ladders.begin(), ladders.end(), [&min](const std::vector<std::string>& ladder) {
-            return ladder.size() > min;
+        ladders.erase(std::remove_if(ladders.begin(), ladders.end(), [&](const std::vector<std::string>& ladder) {
+            return ladder_len(ladder) > min;
         }), ladders.end());
+        */
         return ladders;
     }
 

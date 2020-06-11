@@ -27,7 +27,7 @@ namespace word_ladder {
             static auto hamming_dist(const std::string& str1, const std::string& str2) -> unsigned int;
             void add_edge(const std::string& str1, const std::string& str2, const unsigned int& weight);
 
-            auto ladder_len(std::vector<std::string>& ladder) -> unsigned int;
+            auto ladder_len(const std::vector<std::string>& ladder) -> unsigned int;
             auto validate_edge(const std::string& curr, const std::string& dest, unsigned int iter) -> edge_valid_state;
             auto shortest_ladders(const std::string& from, const std::string& to)
                 -> std::vector<std::vector<std::string>>;
