@@ -3,6 +3,7 @@
 #include <iostream>
 #include <queue>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "absl/container/flat_hash_map.h"
@@ -17,7 +18,7 @@ namespace word_ladder {
         for (auto& word : lexicon) {
             if (word.length() == word_len) {
                 req_lexicon.insert(word);
-                web_[word] = absl::flat_hash_map<std::string, unsigned int>();
+                web_[word] = absl::flat_hash_map<std::string, std::pair<unsigned int, edge_valid_state>>();
             }
         }
         // fill web
@@ -45,8 +46,12 @@ namespace word_ladder {
     }
 
     void word_web::add_edge(const std::string& str1, const std::string& str2, const unsigned int& weight) {
-        web_[str1][str2] = weight;
-        web_[str2][str1] = weight;
+        auto is_valid_edge = none;
+        if (weight == 1) {
+            is_valid_edge = valid;
+        }
+        web_[str1][str2] = std::pair(weight, is_valid_edge);
+        web_[str2][str1] = std::pair(weight, is_valid_edge);
         //std::cout << str1 << " - " << str2 << std::endl;
     }
 
@@ -55,7 +60,7 @@ namespace word_ladder {
         auto it1 = ladder.begin();
         auto it2 = it1 + 1;
         while (it2 != ladder.end()) {
-            len += web_[*it1][*it2];
+            len += web_[*it1][*it2].first;
             it1++;
             it2++;
         }
@@ -63,11 +68,30 @@ namespace word_ladder {
     }
 
     // check to see if two words can connect 1 letter at a time in the web
-    auto word_web::validate_edge(std::string& curr_word, std::string& next_word) -> bool {
-        if (web_by_weight_[curr_word][1].contains(next_word)) {
-            return true;
+    // assumes curr and dest have an existing (unvalidated) edge in the web
+    // always iter < curr.length()
+    auto word_web::validate_edge(const std::string& curr, const std::string& dest, unsigned int iter)
+        -> edge_valid_state {
+        // if iter == 1, will always return valid
+        if (web_[curr][dest].second != none) {
+            return web_[curr][dest].second;
         }
-        for
+        iter--;
+        for (const auto& next : web_[curr]) {
+            if (next.second.first == 1 && web_[next.first].contains(dest)
+                && web_[next.first][dest].first == iter
+                && validate_edge(next.first, dest, iter) == valid) {
+                web_[curr][dest].second = valid;
+                web_[dest][curr].second = valid;
+                // don't return here so we can validate multiple
+                // possible paths that go from curr to dest
+            }
+        }
+        if (web_[curr][dest].second == none) {
+            web_[curr][dest].second = invalid;
+            web_[dest][curr].second = invalid;
+        }
+        return web_[curr][dest].second;
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)
@@ -103,7 +127,8 @@ namespace word_ladder {
                     continue;
                 }
                 for (const auto& next : web_[curr]) {
-                    if (std::find(path.begin(), path.end(), next.first) == path.end()) {
+                    if (std::find(path.begin(), path.end(), next.first) == path.end()
+                        && validate_edge(curr, next.first, next.second.first) == valid) {
                         auto new_path(path);
                         new_path.push_back(next.first);
                         q.push(new_path);
