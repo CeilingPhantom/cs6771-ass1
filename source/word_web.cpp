@@ -1,6 +1,5 @@
 #include <algorithm>
 #include <cstddef>
-#include <iostream>
 #include <queue>
 #include <string>
 #include <vector>
@@ -45,7 +44,6 @@ namespace word_ladder {
     void word_web::add_edge(const std::string& str1, const std::string& str2) {
         web_[str1].insert(str2);
         web_[str2].insert(str1);
-        //std::cout << str1 << " - " << str2 << std::endl;
     }
 
     auto word_web::shortest_ladders(const std::string& from, const std::string& to)
@@ -55,7 +53,7 @@ namespace word_ladder {
         std::queue<std::vector<std::string>> q;
         std::vector<std::string> path;
         std::size_t prev_ladder_len = 0;
-        absl::flat_hash_set<std::string> visited_prev_ladder_len;
+        absl::flat_hash_set<std::string> visited_prev_ladder_lens;
         absl::flat_hash_set<std::string> visited_curr_ladder_len;
         path.push_back(from);
         visited_curr_ladder_len.insert(from);
@@ -66,8 +64,8 @@ namespace word_ladder {
             // if path length increased
             // should be an increase by 1
             if (path.size() != prev_ladder_len) {
-                visited_prev_ladder_len = visited_curr_ladder_len;
-                visited_prev_ladder_len.clear();
+                visited_prev_ladder_lens.insert(visited_curr_ladder_len.begin(), visited_curr_ladder_len.end());
+                visited_curr_ladder_len.clear();
                 prev_ladder_len++;
             }
             const auto& curr = path.back();
@@ -97,7 +95,7 @@ namespace word_ladder {
                 for (const auto& next : web_[curr]) {
                     // check next word isn't one that we've already visited
                     if (std::find(path.begin(), path.end(), next) == path.end()
-                        && !visited_prev_ladder_len.contains(next)) {
+                        && !visited_prev_ladder_lens.contains(next)) {
                         auto new_path(path);
                         new_path.push_back(next);
                         visited_curr_ladder_len.insert(next);
@@ -118,19 +116,13 @@ namespace word_ladder {
     auto word_web::shortest_ladders_sorted(const std::string &from, const std::string &to)
         -> std::vector<std::vector<std::string>> {
         auto ladders = shortest_ladders(from, to);
-        /*
-        std::cout << std::endl;
-        for (auto& ladder : ladders) {
-            for (auto& word : ladder) {
-                std::cout << word << " ";
-            }
-            std::cout << std::endl;
-        }
-        */
         // sort shortest ladders
         std::sort(ladders.begin(), ladders.end(),
             [](std::vector<std::string>& ladder1, std::vector<std::string>& ladder2) {
             auto mismatch_pair = std::mismatch(ladder1.begin(), ladder1.end(), ladder2.begin());
+            if (mismatch_pair.first == ladder1.end()) {
+                return false;
+            }
             return std::string(*mismatch_pair.first) < std::string(*mismatch_pair.second);
         });
         return ladders;

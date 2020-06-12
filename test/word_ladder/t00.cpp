@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "catch2/catch.hpp"
 #include "comp6771/testing/range/contain.hpp"
@@ -17,6 +18,8 @@ TEST_CASE("cat -> sea") {
 	CHECK(ranges::is_sorted(ladders));
 
 	CHECK(ranges::any_of(ladders, testing::contain({"cat", "sat", "set", "sea"})));
+
+	std::cout << ":" << ladders.size() << std::endl;
 }
 
 TEST_CASE("sea -> cat") {
@@ -27,4 +30,6 @@ TEST_CASE("sea -> cat") {
 	CHECK(ranges::is_sorted(ladders));
 
 	CHECK(ranges::any_of(ladders, testing::contain({"sea", "set", "sat", "cat"})));
+
+	std::cout << ":" << ladders.size() << std::endl;
 }

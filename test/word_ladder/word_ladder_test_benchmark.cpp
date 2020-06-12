@@ -29,7 +29,8 @@ TEST_CASE("atlases -> cabaret") {
 	auto const english_lexicon = ::word_ladder::read_lexicon("./english.txt");
 	auto const ladders = ::word_ladder::generate("atlases", "cabaret", english_lexicon);
 
-	std::cout << ":" << ladders.size() << std::endl;
-
 	CHECK(ranges::size(ladders) != 0);
+	CHECK(ranges::is_sorted(ladders));
+
+	std::cout << ":" << ladders.size() << std::endl;
 }
