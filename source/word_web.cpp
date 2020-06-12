@@ -53,8 +53,11 @@ namespace word_ladder {
         std::queue<std::vector<std::string>> q;
         std::vector<std::string> path;
         std::size_t prev_ladder_len = 0;
+        // words visited in all paths of len <= curr_path.size()
         absl::flat_hash_set<std::string> visited_prev_ladder_lens;
+        // new words visited
         absl::flat_hash_set<std::string> visited_curr_ladder_len;
+
         path.push_back(from);
         visited_curr_ladder_len.insert(from);
         q.push(path);
@@ -94,8 +97,7 @@ namespace word_ladder {
                 }
                 for (const auto& next : web_[curr]) {
                     // check next word isn't one that we've already visited
-                    if (std::find(path.begin(), path.end(), next) == path.end()
-                        && !visited_prev_ladder_lens.contains(next)) {
+                    if (!visited_prev_ladder_lens.contains(next)) {
                         auto new_path(path);
                         new_path.push_back(next);
                         visited_curr_ladder_len.insert(next);
