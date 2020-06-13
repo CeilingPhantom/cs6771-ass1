@@ -1,4 +1,5 @@
 configure_file("english.txt" ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
+configure_file("lex0" ${CMAKE_CURRENT_BINARY_DIR} COPYONLY)
 
 cxx_test(
    TARGET word_ladder_test1
