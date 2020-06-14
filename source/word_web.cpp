@@ -122,16 +122,7 @@ namespace word_ladder {
 	   -> std::vector<std::vector<std::string>> {
 		auto ladders = shortest_ladders(from, to);
 		// sort shortest ladders
-		std::sort(ladders.begin(),
-		          ladders.end(),
-		          [](std::vector<std::string>& ladder1, std::vector<std::string>& ladder2) {
-			          if (ladder1 == ladder2) {
-				          return false;
-			          }
-			          auto mismatch_pair =
-			             std::mismatch(ladder1.begin(), ladder1.end(), ladder2.begin());
-			          return std::string(*mismatch_pair.first) < std::string(*mismatch_pair.second);
-		          });
+		std::sort(ladders.begin(), ladders.end());
 		return ladders;
 	}
 } // namespace word_ladder
