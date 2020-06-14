@@ -125,11 +125,11 @@ namespace word_ladder {
 		std::sort(ladders.begin(),
 		          ladders.end(),
 		          [](std::vector<std::string>& ladder1, std::vector<std::string>& ladder2) {
-			          auto mismatch_pair =
-			             std::mismatch(ladder1.begin(), ladder1.end(), ladder2.begin());
-			          if (mismatch_pair.first == ladder1.end()) {
+			          if (ladder1 == ladder2) {
 				          return false;
 			          }
+			          auto mismatch_pair =
+			             std::mismatch(ladder1.begin(), ladder1.end(), ladder2.begin());
 			          return std::string(*mismatch_pair.first) < std::string(*mismatch_pair.second);
 		          });
 		return ladders;
